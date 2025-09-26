@@ -12,19 +12,16 @@ const connectSocket = () => {
     transport: SOCKET_TRANSPORTS,
     path: SOCKET_PATH,
   });
-  // onAny subscribes to every events
-  /*
-  socket.onAny((...args) => {
-    console.log(...args);
-  });
-   */
   return socket;
 };
 
 function App() {
   const [messages, setMessages] = useState([]);
   const localSocket = useRef(null);
+  const messagesEndRef = useRef(null)
 
+  
+  
   useEffect(() => {
     const socket = connectSocket();
     if (localSocket) {
@@ -38,16 +35,21 @@ function App() {
       socket.close();
     };
   }, []);
-
+  
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages]);
+  
   function addNewMessage(newMessage) {
     setMessages((messages) => [...messages, newMessage])
   }
-
+  function scrollToBottom() {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+  
   function handleSubmit(e) {
-    // Prevent the browser from reloading the page
     e.preventDefault();
 
-    // Read the form data
     const form = e.target;
     const formData = new FormData(form);
 
@@ -61,8 +63,6 @@ function App() {
         color: 'blue',
       },
     };
-
-    console.log(newMessageObject);
     localSocket.current.emit('send-message', newMessageObject);
   }
 
@@ -70,7 +70,7 @@ function App() {
     <div>
       <div
         style={{
-          height: '250px',
+          height: '50px',
           overflow: 'scroll',
         }}
       >
@@ -88,6 +88,7 @@ function App() {
             </div>
           );
         })}
+        <div ref={messagesEndRef} />
       </div>
       <div>
         <form method="post" onSubmit={handleSubmit}>
