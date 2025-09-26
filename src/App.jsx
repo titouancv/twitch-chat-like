@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
-import io from 'socket.io-client';
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import io from "socket.io-client";
 
-import './App.css';
+import "./App.css";
 
-const CONNECTION_URL = 'wss://api.dev.stories.studio/';
-const SOCKET_PATH = '/interview-test';
-const SOCKET_TRANSPORTS = ['websocket'];
+const CONNECTION_URL = "wss://api.dev.stories.studio/";
+const SOCKET_PATH = "/interview-test";
+const SOCKET_TRANSPORTS = ["websocket"];
 
 const connectSocket = () => {
   const socket = io(CONNECTION_URL, {
@@ -17,36 +17,51 @@ const connectSocket = () => {
 
 function App() {
   const [messages, setMessages] = useState([]);
+  const [chatAutoScroll, setChatAutoScroll] = useState(true);
   const localSocket = useRef(null);
-  const messagesEndRef = useRef(null)
+  const messagesEndRef = useRef(null);
+  const chatRef = useRef(null);
 
-  
-  
   useEffect(() => {
     const socket = connectSocket();
     if (localSocket) {
       localSocket.current = socket;
-      console.log(localSocket.current);
     }
-    socket.on('new-message', (arg) => {
+    socket.on("new-message", (arg) => {
       addNewMessage(arg);
     });
+
     return () => {
       socket.close();
     };
   }, []);
-  
+
+  const scrollToBottom = useCallback(() => {
+    if (!chatAutoScroll) return;
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatAutoScroll]);
+
   useEffect(() => {
-    scrollToBottom()
-  }, [messages]);
-  
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
+
+  function handleScroll() {
+    if (chatRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = chatRef.current;
+      const isNearBottom = scrollTop + clientHeight >= scrollHeight;
+
+      if (isNearBottom) {
+        setChatAutoScroll(true);
+      } else {
+        setChatAutoScroll(false);
+      }
+    }
+  }
+
   function addNewMessage(newMessage) {
-    setMessages((messages) => [...messages, newMessage])
+    setMessages((messages) => [...messages, newMessage]);
   }
-  function scrollToBottom() {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
-  
+
   function handleSubmit(e) {
     e.preventDefault();
 
@@ -56,22 +71,24 @@ function App() {
     const formJson = Object.fromEntries(formData.entries());
 
     let newMessageObject = {
-      type: 'text',
+      type: "text",
       text: formJson.textMessage,
       user: {
-        username: 'user',
-        color: 'blue',
+        username: "user",
+        color: "blue",
       },
     };
-    localSocket.current.emit('send-message', newMessageObject);
+    localSocket.current.emit("send-message", newMessageObject);
   }
 
   return (
     <div>
       <div
+        ref={chatRef}
+        onScroll={handleScroll}
         style={{
-          height: '50px',
-          overflow: 'scroll',
+          height: "150px",
+          overflow: "scroll",
         }}
       >
         {messages.map((message) => {
