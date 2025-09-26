@@ -75,46 +75,127 @@ function App() {
       text: formJson.textMessage,
       user: {
         username: "user",
-        color: "blue",
+        color: "red",
       },
     };
     localSocket.current.emit("send-message", newMessageObject);
   }
 
   return (
-    <div>
+    <div
+      style={{
+        height: "100%",
+        alignItems: "center",
+      }}
+    >
       <div
-        ref={chatRef}
-        onScroll={handleScroll}
         style={{
-          height: "150px",
-          overflow: "scroll",
+          textAlign: "center",
+          backgroundColor: "#18181b",
+          borderBottom: "1px solid #8f8f8fff",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
-        {messages.map((message) => {
-          return (
-            <div>
-              <span
+        <p
+          style={{
+            color: "white",
+            fontWeight: "bold",
+            marginBlock: "8px",
+          }}
+        >
+          Chat du stream
+        </p>
+      </div>
+      <div
+        style={{
+          width: "300px",
+          height: "100%",
+          backgroundColor: "#18181b",
+          padding: "8px",
+        }}
+      >
+        <div
+          ref={chatRef}
+          onScroll={handleScroll}
+          style={{
+            height: "600px",
+            display: "flex",
+            paddingInline: "8px",
+            flexDirection: "column",
+            alignItems: "start",
+            overflow: "scroll",
+          }}
+        >
+          {messages.map((message) => {
+            return (
+              <div
+                key={message.id}
                 style={{
-                  color: message.user.color,
+                  textAlign: "left",
                 }}
               >
-                {message.user.username}:
-              </span>
-              <span>{message.text}</span>
+                <p style={{ color: "white", marginBlock: "2px" }}>
+                  <span
+                    style={{
+                      color: message.user.color,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {message.user.username + ": "}
+                  </span>
+                  <span>{message.text}</span>
+                </p>
+              </div>
+            );
+          })}
+          <div ref={messagesEndRef} />
+        </div>
+        <div>
+          <form
+            method="post"
+            onSubmit={handleSubmit}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "end",
+              gap: "8px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                borderRadius: "4px",
+                height: "32px",
+                width: "100%",
+              }}
+            >
+              <input
+                name="textMessage"
+                placeholder="Envoyer a message"
+                style={{
+                  backgroundColor: "transparent",
+                  border: "1px solid #d4d4d9",
+                  borderRadius: "4px",
+                  width: "100%",
+                }}
+              />
             </div>
-          );
-        })}
-        <div ref={messagesEndRef} />
-      </div>
-      <div>
-        <form method="post" onSubmit={handleSubmit}>
-          <label>
-            New message:
-            <input name="textMessage" defaultValue="Some initial value" />
-          </label>
-          <button type="submit">Submit form</button>
-        </form>
+            <button
+              type="submit"
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "#9146ff",
+                height: "32px",
+              }}
+            >
+              Chat
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
