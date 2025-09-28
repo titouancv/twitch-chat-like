@@ -1,4 +1,4 @@
-# My Vite + React Project
+# Twitch chat
 
 This project is an application built with **Vite** and **React**. It serves as a foundation for developing modern front-end applications with fast and efficient rendering.
 
