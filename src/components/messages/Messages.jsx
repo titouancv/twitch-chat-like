@@ -30,12 +30,12 @@ function Messages({ messages }) {
 
   return (
     <div style={{ position: "relative" }}>
-      <div onScroll={handleScroll} className="chat-messages">
+      <div onScroll={handleScroll} className="messages">
         {messages.map((message) => (
-          <div key={message.id} className="chat-message">
+          <div key={message.id} className="message">
             <p>
               <span
-                className="chat-message-username"
+                className="message-username"
                 style={{ color: message.user.color }}
               >
                 {message.user.username + ": "}

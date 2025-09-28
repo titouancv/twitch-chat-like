@@ -1,4 +1,4 @@
-.chat-messages {
+.messages {
   height: 600px;
   display: flex;
   flex-direction: column;
@@ -7,16 +7,16 @@
   overflow: scroll;
 }
 
-.chat-message {
+.message {
   text-align: left;
 }
 
-.chat-message p {
+.message p {
   color: white;
   margin-block: 2px;
 }
 
-.chat-message-username {
+.message-username {
   font-weight: bold;
 }
 
