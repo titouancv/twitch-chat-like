@@ -18,9 +18,11 @@ const connectSocket = () => {
 function App() {
   const [messages, setMessages] = useState([]);
   const [chatAutoScroll, setChatAutoScroll] = useState(true);
+  const [scrollAlertHover, setScrollAlertHover] = useState(false);
   const localSocket = useRef(null);
   const messagesEndRef = useRef(null);
   const chatRef = useRef(null);
+  const lastScrollTop = useRef(0);
 
   useEffect(() => {
     const socket = connectSocket();
@@ -45,16 +47,17 @@ function App() {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  function handleScroll() {
+  function handleScroll(event) {
     if (chatRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = chatRef.current;
-      const isNearBottom = scrollTop + clientHeight >= scrollHeight;
+      const currentScrollTop = event.target.scrollTop;
 
-      if (isNearBottom) {
+      if (currentScrollTop > lastScrollTop.current) {
         setChatAutoScroll(true);
       } else {
         setChatAutoScroll(false);
       }
+      lastScrollTop.current = currentScrollTop;
+      console.log(chatAutoScroll);
     }
   }
 
@@ -79,119 +82,61 @@ function App() {
       },
     };
     localSocket.current.emit("send-message", newMessageObject);
+    form.reset();
   }
 
   return (
-    <div
-      style={{
-        height: "100%",
-        alignItems: "center",
-      }}
-    >
-      <div
-        style={{
-          textAlign: "center",
-          backgroundColor: "#18181b",
-          borderBottom: "1px solid #8f8f8fff",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <p
-          style={{
-            color: "white",
-            fontWeight: "bold",
-            marginBlock: "8px",
-          }}
-        >
-          Chat du stream
-        </p>
+    <div className="app-container">
+      <div className="chat-header">
+        <p>Chat du stream</p>
       </div>
-      <div
-        style={{
-          width: "300px",
-          height: "100%",
-          backgroundColor: "#18181b",
-          padding: "8px",
-        }}
-      >
-        <div
-          ref={chatRef}
-          onScroll={handleScroll}
-          style={{
-            height: "600px",
-            display: "flex",
-            paddingInline: "8px",
-            flexDirection: "column",
-            alignItems: "start",
-            overflow: "scroll",
-          }}
-        >
-          {messages.map((message) => {
-            return (
-              <div
-                key={message.id}
-                style={{
-                  textAlign: "left",
-                }}
-              >
-                <p style={{ color: "white", marginBlock: "2px" }}>
+
+      <div className="chat-box">
+        <div style={{ position: "relative" }}>
+          <div ref={chatRef} onScroll={handleScroll} className="chat-messages">
+            {messages.map((message) => (
+              <div key={message.id} className="chat-message">
+                <p>
                   <span
-                    style={{
-                      color: message.user.color,
-                      fontWeight: "bold",
-                    }}
+                    className="chat-message-username"
+                    style={{ color: message.user.color }}
                   >
                     {message.user.username + ": "}
                   </span>
                   <span>{message.text}</span>
                 </p>
               </div>
-            );
-          })}
-          <div ref={messagesEndRef} />
-        </div>
-        <div>
-          <form
-            method="post"
-            onSubmit={handleSubmit}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "end",
-              gap: "8px",
-            }}
-          >
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {!chatAutoScroll && (
             <div
-              style={{
-                display: "flex",
-                borderRadius: "4px",
-                height: "32px",
-                width: "100%",
+              className="scroll-alert"
+              onClick={() => {
+                setChatAutoScroll(true);
+                setScrollAlertHover(false);
               }}
+              onMouseEnter={() => setScrollAlertHover(true)}
+              onMouseLeave={() => setScrollAlertHover(false)}
             >
+              {scrollAlertHover
+                ? "Reprendre le défilement"
+                : "Chat mis en pause à cause du défilement"}
+            </div>
+          )}
+        </div>
+
+        <div>
+          <form method="post" onSubmit={handleSubmit} className="chat-form">
+            <div className="chat-input-container">
               <input
                 name="textMessage"
-                placeholder="Envoyer a message"
-                style={{
-                  backgroundColor: "transparent",
-                  border: "1px solid #d4d4d9",
-                  borderRadius: "4px",
-                  width: "100%",
-                }}
+                placeholder="Envoyer un message"
+                className="chat-input"
               />
             </div>
-            <button
-              type="submit"
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: "#9146ff",
-                height: "32px",
-              }}
-            >
+            <button type="submit" className="chat-button">
               Chat
             </button>
           </form>
