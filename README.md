@@ -32,17 +32,19 @@ npm run dev
 
 ## ⚡ Features
 
-| Feature                             | Time to implement |
-| ----------------------------------- | ----------------- |
-| Automatic scroll.                   | 2 hours           |
-| xxxxxxxx                            | 1.5 hours         |
-| xxxxxxxx                            | 3 hours           |
-| xxxxxxxx                            | 1 hour            |
+| Feature                                          | Time to implement |
+| ------------------------------------------------ | ----------------- |
+| Automatic scroll                                 | 30 minutes        |
+| Stop auto scroll when the user scroll to the top | 45 minutes        |
+| Button to restart auto scroll                    | 30 minutes        |
+| Layout + UI                                      | 1 hour            |
+| Code cleaning + divise code in multiple coponent | 30 minutes        |
 
 ---
 
 ## ❌ Missing / Upcoming Features
 
-* scroll & stop
-* layout
-* ui
+- fix ui of scrollbar when there is auto scroll
+- create responsive design
+- chat parameters
+- implement emoji in the chat and the button in the form
